@@ -1,0 +1,30 @@
+# docker-compose.yml
+version: "3.9"
+services:
+  fastapi-app:
+    build: .
+    ports:
+      - "8000:8000"
+    container_name: fastapi-app
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Mount Prometheus config
+    container_name: prometheus
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin  # Default Grafana admin user
+      GF_SECURITY_ADMIN_PASSWORD: password # Default Grafana admin password (change in production!)
+    depends_on:
+      - prometheus # Grafana starts after Prometheus
+    restart: always
